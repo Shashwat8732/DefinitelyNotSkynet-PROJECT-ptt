@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PTTInterface from './components/PTTInterface';
+import PTTInterface from './PTTInterface';
 import { Shield, Zap, Target, Lock } from 'lucide-react';
 
 export default function App() {
