@@ -32,7 +32,7 @@ app = FastAPI(title="PTT CyberSec Assistant API")
 # CORS - Frontend se connect karne ke liye ZARURI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=["https://mango-glacier-012d66b00.6.azurestaticapps.net"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
