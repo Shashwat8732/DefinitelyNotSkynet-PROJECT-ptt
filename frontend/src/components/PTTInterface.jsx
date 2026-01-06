@@ -88,47 +88,54 @@ export default function PTTInterface() {
         addLog('status', payload);
         break;
 
+      case 'info':
+        addLog('info', payload);
+        break;
+
       case 'log':
         addLog('log', payload);
         setCurrentTask(payload);
         break;
 
-      case 'summary':
-        addLog('success', `✅ ${payload}`);
+      case 'tool_use':
+        addLog(
+          'thinking',
+          `🔧 Tool: ${payload.name} ${JSON.stringify(payload.args)}`
+        );
         break;
 
-      case 'error':
-        addLog('error', `❌ ${payload}`);
+      case 'summary':
+        addLog('success', payload);
+        break;
+
+      case 'success':
+        addLog('success', payload);
+        break;
+
+      case 'tree_state':
+        setTaskTree(payload);
+        addLog('info', '🌳 Task tree updated');
         break;
 
       case 'question':
         setUserInputRequired(true);
         setUserInputPrompt(payload);
-        addLog('input', `❓ User input required: ${payload}`);
+        addLog('input', `❓ ${payload}`);
         break;
 
-      case 'initial_tasks':
-        addLog('info', `📋 Initial tasks created`);
-        // Parse task tree if available
-        try {
-          const tasks = JSON.parse(payload);
-          setTaskTree(tasks.initial_tasks || []);
-        } catch (e) {
-          console.log('Could not parse tasks:', e);
-        }
-        break;
-
-      case 'Running_loop':
-        addLog('thinking', `🧠 ${payload}`);
+      case 'error':
+        addLog('error', payload);
         break;
 
       default:
-        console.log('Unknown message type:', type, payload);
+        // IMPORTANT: prevents silent drops in future
+        addLog('info', `[${type}] ${JSON.stringify(payload)}`);
     }
   };
 
-  const handleAgentError = (error) => {
-    addLog('error', `Connection error: ${error.message || 'Unknown error'}`);
+
+  const handleAgentError = () => {
+    addLog('status', '🔌 Agent connection closed');
     setIsRunning(false);
   };
 
@@ -226,7 +233,7 @@ export default function PTTInterface() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
         {/* Left Panel - Configuration */}
         <div className="col-span-1">
           <div className="bg-black bg-opacity-50 backdrop-blur-lg border border-cyan-500 border-opacity-30 rounded-2xl p-6">
@@ -308,7 +315,7 @@ export default function PTTInterface() {
         </div>
 
         {/* Right Panel - Logs & Output */}
-        <div className="col-span-2 space-y-4">
+        <div className="col-span-3 space-y-4">
           {/* Current Task */}
           {currentTask && isRunning && (
             <div className="bg-gradient-to-r from-blue-900 to-purple-900 bg-opacity-50 backdrop-blur-lg border border-blue-500 border-opacity-50 rounded-2xl p-4">
@@ -363,7 +370,7 @@ export default function PTTInterface() {
               </button>
             </div>
 
-            <div className="h-96 overflow-y-auto space-y-2 font-mono text-xs">
+            <div className="h-[600px] overflow-y-auto space-y-2 font-mono text-xs">
               {logs.length === 0 ? (
                 <div className="flex items-center justify-center h-full text-gray-500">
                   <p>No logs yet. Start the agent to see activity.</p>
